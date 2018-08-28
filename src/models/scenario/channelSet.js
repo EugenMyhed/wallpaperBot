@@ -11,7 +11,7 @@ import { setChannel } from '../db/dbController'
 //class construction
 class channelSet {
     async start(ctx, next) {
-        const user_id = top.text.split(Text.createChannelCommandIndexOf)[1]
+        const user_id = ctx.channelPost.text.split(Text.createChannelCommandIndexOf)[1]
         // logger.debug(user_id)
         const data = await setChannel(user_id, ctx.chat.id)
             .catch(err => errInRunway(ctx, err, res))
@@ -28,4 +28,4 @@ function errInRunway(ctx, err, res) {
     res()
     //log about user and err type
 }
-export default new channelSet(ctx)
+export default new channelSet()

@@ -10,18 +10,13 @@ import userGreeting_SC from './scenario/userGreeting'
 import wallCreation_SC from './scenario/wallCreation'
 import startAbout_SC from './scenario/startAbout'
 import channelSet_SC from './scenario/channelSet'
+import postCreation_SC from './scenario/postCreation'
 
 import logger from './logger'
 
 import { getUser, setUser, setChannel } from './db/dbController'
 
 export default function (bot) {
-    bot.use((ctx, next) => {
-        ctx.session.scenario = ctx.session.scenario || 'empty'
-        ctx.session.options = ctx.session.options || {}
-        next()
-    })
-
     bot.start(async (ctx, next) => {
         if (await destributeScenario('start', ctx, next)) {
             //logger.debug(1)
@@ -30,27 +25,86 @@ export default function (bot) {
         }
     })
 
-    bot.on('callback_query', async (ctx, next) => {
-        if (!await destributeScenario('callback_query', ctx, next))
+    bot.on('callback_query', async function (ctx, next) {
+        if (!await destributeScenario('callback_query', ctx, next)) {
+            ctx.session.mes_1 = 'hui'
             callback_queryHandler(ctx, next)
+        }
     })
     bot.on('message', async (ctx, next) => {
         await destributeScenario('message', ctx, next)
     })
 
     bot.on('text', async (ctx, next) => {
-        await destributrseScenario('text', ctx, next)
+        if (!await destributrseScenario('text', ctx, next)) {
+            if (ctx.message.text == Text.createPost_key) {
+                await postCreation_SC.start(ctx)
+            }
+        }
     })
     bot.on('channel_post', async (ctx, next) => {
         const post = ctx.channelPost
         if (post.text.split(Text.createChannelCommandIndexOf)[1]) {
+            //logger.debug(`User id: ${post.text.split(Text.createChannelCommandIndexOf)[1]}`)
             channelSet_SC.start(ctx, next)
-        } else next()
+        }
     })
 
 }
+//-------------------
+//dataChannel handler
+async function callback_queryHandler(ctx, next) {
+    //logger.debug(`inCallbackData`)
+    const query = ctx.callbackQuery
+    switch (query.data) {
+    case 'createWall':
+        ctx.session.message = 'huy'
+        wallCreation_SC.start('callback_query', ctx, next)
+        break
+    default:
+        ctx.answerCbQuery(Text.nowCallbackData)
+    }
+}
+
+function preSession(ctx) {
+    if (ctx.session) {
+        ctx.session.scenario = ctx.session.scenario || 'empty'
+        ctx.session.options = ctx.session.options || {}
+        userGreeting_SC.launchStep(ctx)
+        wallCreation_SC.launchStep(ctx)
+        startAbout_SC.launchStep(ctx)
+        postCreation_SC.launchStep(ctx)
+    }
+}
+async function startHandler(ctx, next) {
+    logger.debug(`inStart ${ctx.session.scenario}`)
+    const mes = ctx.message
+    const wall = await getUser(mes.chat.id)
+        .catch(err => errInRunway(ctx, err)) || {}
+    setOptions(ctx, wall)
+    logger.debug(`Option fullness ${getOptionFullness(wall)} !`)
+    switch (getOptionFullness(wall)) {
+    case 0:
+        await userGreeting_SC.start('start', ctx, next)
+        break
+    case 1:
+        await wallCreation_SC.start('start', ctx, next)
+        break
+    case 2:
+        await ctx.reply('Канал', keyboard.chooseChannel(wall.user_id))
+        break
+    case 3:
+        // await wallCreation_SC.makeStep('start', ctx, next, 2)
+        break
+    default:
+        next()
+        break
+    }
+}
+//----------------
 async function destributeScenario(dataChannel, ctx, next) {
     return new Promise(async (res, rej) => {
+        preSession(ctx)
         logger.debug(`inDistributer ${ctx.session.scenario}`)
         switch (ctx.session.scenario) {
         case 'userGreeting':
@@ -82,48 +136,6 @@ async function destributeScenario(dataChannel, ctx, next) {
         }
     })
 }
-//-------------------
-//dataChannel handler
-//this functions handles only emty scenario
-async function callback_queryHandler(ctx, next) {
-    logger.debug(`inCallbackData`)
-    const query = ctx.callbackQuery
-    switch (query.data) {
-    case 'createWall':
-        wallCreation_SC.start('callback_query', ctx, next)
-        break
-    default:
-        next()
-
-    }
-}
-
-async function startHandler(ctx, next) {
-    logger.debug(`inStart ${ctx.session.scenario}`)
-    const mes = ctx.message
-    const wall = await getUser(mes.chat.id)
-        .catch(err => errInRunway(ctx, err)) || {}
-    setOptions(ctx, wall)
-    logger.debug(`${getOptionFullness(wall)} !`)
-    switch (getOptionFullness(wall)) {
-    case 0:
-        await userGreeting_SC.start('start', ctx, next)
-        break
-    case 1:
-        await wallCreation_SC.start('start', ctx, next)
-        break
-    case 2:
-        await wallCreation_SC.step('start', ctx, next, 1)
-        break
-    case 3:
-        await wallCreation_SC.step('start', ctx, next, 2)
-        break
-    default:
-        next()
-        break
-    }
-}
-//----------------
 //helping functions
 
 //this function handle all scenario
@@ -134,9 +146,10 @@ function errInRunway(ctx, err) {
 }
 
 function getOptionFullness(options) {
-    if (options.chat_id && options.user_id) return 1
+    // logger.debug(options)
+    if (options.chat_id && options.user_id && options.username && options.channel_id) return 3
     else if (options.chat_id && options.user_id && options.username) return 2
-    else if (options.chat_id && options.user_id && options.username && options.channel_id) return 3
+    else if (options.chat_id && options.user_id) return 1
     else return 0
 }
 

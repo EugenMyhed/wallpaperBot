@@ -15,7 +15,7 @@ class Keyboard {
     }
     get userKeyboard() {
         return Markup.keyboard([
-                [Text.createPost_key]
+                [Text.createPost_key],
                 [Text.mainKeyboard]
             ])
             .oneTime()

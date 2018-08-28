@@ -20,14 +20,13 @@ class Text {
     get mainKeyboard() {
         return 'Обратная связь'
     }
-
-    //---------------------------
-    //Создание поста
     get createPost_key() {
         return 'Запостить что-то 🔥'
     }
+    //---------------------------
+    //Создание поста
     get _createPost() {
-        return 'Окей, просто тправь нам что-то'
+        return 'Окей, просто отправь нам что-то'
     }
     get createPost_forbid() {
         return 'данный тип контента пока недоступен)'
@@ -36,9 +35,6 @@ class Text {
     //создание стены
     get usernameWarning() {
         return 'Ваш ник должен быть в формате текста)'
-    }
-    createChannelCommandInline(id) {
-        return `@wallpaperNewsBot /makeThisChannelMyWallpaper${id}`
     }
     get createChannelCommandIndexOf() {
         return `@wallpaperNewsBot /makeThisChannelMyWallpaper`
@@ -112,6 +108,9 @@ class Text {
     // errors
     get err() {
         return 'Где-то тут ошибка, скорее всего во мне, так что подожди, я все исправлю сам'
+    }
+    get nowCallbackData() {
+        return 'Мне не совсем понятно'
     }
 }
 

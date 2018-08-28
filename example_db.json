@@ -3,8 +3,17 @@
     {
       "id": "222420524:222420524",
       "data": {
-        "scenario": "wallCreation",
-        "options": {}
+        "scenario": null,
+        "options": {
+          "chat_id": 222420524,
+          "user_id": 652538218,
+          "username": "nextUsername"
+        },
+        "userGreeting": 1,
+        "wallCreation": 2,
+        "startAbout": 0,
+        "mes_1": "hui",
+        "message": "huy"
       }
     }
   ]

@@ -2,26 +2,24 @@
 import Telegraf from 'telegraf'
 
 import LocalSession from 'telegraf-session-local'
-import Stage from 'telegraf/stage'
-import Scene from 'telegraf/scenes/base'
-
+import session from 'telegraf/session'
 import logger from './models/logger'
 import { TOKEN } from './config/config'
 
 import scenarioController from './models/scenarioController'
-// import BotMainInterface from './models/bot'
-// import FeedBackMainInterface from './models/feedback'
 
 require('babel-core/register')
 require('babel-polyfill')
 
 const PORT = process.env.PORT || 3000
 const bot = new Telegraf(TOKEN) //pooling true
-const stage = new Stage()
 
-bot.use((new LocalSession({ database: 'example_db.json' }))
+bot.use((new LocalSession({
+        database: 'example_db.json',
+        storage: LocalSession.storageFileAsync
+    }))
     .middleware())
-//bot.use(stage.middleware())
+// bot.use(session())
 
 bot.telegram.getMe()
     .then(botInformation => {
@@ -37,8 +35,6 @@ bot.use(async (ctx, next) => {
     logger.info('Response time %sms', ms)
 })
 scenarioController(bot)
-//BotMainInterface(bot)
-//FeedBackMainInterface(bot)
 
 bot.catch(err => {
     logger.error(`Error in bot Middelware: ${err}`)

@@ -34,4 +34,4 @@ async function interuption(ctx) {
         res()
     })
 }
-return userGreeting
+export default userGreeting

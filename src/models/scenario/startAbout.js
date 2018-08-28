@@ -36,4 +36,4 @@ async function interuption(ctx) {
         res()
     })
 }
-return startAbout
+export default startAbout

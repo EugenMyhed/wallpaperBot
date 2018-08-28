@@ -31,6 +31,7 @@ wallCreation.setSteps([{
 
 async function reaction1(ctx) {
     return new Promise(async (res, rej) => {
+        logger.debug('step 1')
         ctx.answerCbQuery()
         ctx.reply(Text.chooseUsername, keyboard.chooseUsername)
         res()
@@ -39,12 +40,13 @@ async function reaction1(ctx) {
 async function reaction2(ctx) {
     return new Promise(async (res, rej) => {
         logger.debug('step 2')
+        // wallCreation.walk()
         if (ctx.callbackQuery) ctx.answerCbQuery()
         const { chat_id, user_id, username } = getDataByCtx(ctx)
         await setUser(ctx, chat_id, user_id, username)
             .catch(err => errInRunway(ctx, err, res))
         ctx.session.options = getDataByCtx(ctx)
-        await wallCreation.syncAnswer(ctx, Text.setChannelArray(username))
+        await wallCreation.asyncAnswer(ctx, Text.setChannelArray(username))
             .catch(err => errInRunway(ctx, err, res))
         ctx.reply('Канал', keyboard.chooseChannel(user_id))
         res()
@@ -79,3 +81,4 @@ function getDataByCtx(ctx) {
             username: ctx.message.text
         }
 }
+export default wallCreation
