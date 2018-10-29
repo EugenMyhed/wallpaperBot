@@ -26,7 +26,7 @@ class Scenarion extends instrumentHolder {
     nextStep(ctx) {
         this.step++;
         ctx.session[this.name] = this.step
-        logger.debug(`Session scenario: ${ctx.session[this.name]} and ${this.step}`)
+        // logger.debug(`Session scenario: ${ctx.session[this.name]} and ${this.step}`)
         if (this.step == this.steps.length)
             this.killScenario(ctx)
     }
@@ -34,11 +34,13 @@ class Scenarion extends instrumentHolder {
         ctx.session.scenario = null
     }
     start(dataChannel, ctx, next) {
-        //logger.info(`${this.name} started!!!!`)
+        logger.info(`${this.name} started!!!!`)
         this.makeStep(dataChannel, ctx, next, 0)
     }
     async control(dataChannel, ctx, next) {
         return new Promise(async (res, rej) => {
+            if (!dataChannel || !ctx || !next)
+                logger.error(`Scenario Error: options do not complete`)
             ctx.session.scenario = this.name
             logger.debug(`Session scenario: ${ctx.session.scenario}`)
             //logger.debug(`${dataChannel}`)
