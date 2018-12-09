@@ -1,25 +1,31 @@
 'use strict'
+
+import 'babel-polyfill';
+require('babel-core/register')
+
 import Telegraf from 'telegraf'
 
-import LocalSession from 'telegraf-session-local'
-import session from 'telegraf/session'
 import logger from './models/logger'
-import { TOKEN } from './config/config'
+import config from './config/config-file'
 
-import scenarioController from './models/scenarioController'
+import botBody from './logic/bot-body'
+import info from './logic/info'
+import support from './logic/support'
+import multySend from './logic/multySend'
 
-require('babel-core/register')
-require('babel-polyfill')
+import sessionRedis from './framework/sessionRedis'
 
-const PORT = process.env.PORT || 3000
-const bot = new Telegraf(TOKEN) //pooling true
+const bot = new Telegraf(config.token, { channelMode: false })
 
-bot.use((new LocalSession({
-        database: 'example_db.json',
-        storage: LocalSession.storageFileAsync
-    }))
-    .middleware())
-// bot.use(session())
+
+const session = new sessionRedis({
+    store: {
+        host: config.REDIS.TELEGRAM_SESSION_HOST,
+        port: config.REDIS.TELEGRAM_SESSION_PORT
+    }
+})
+
+bot.use(session.middlewareCustom())
 
 bot.telegram.getMe()
     .then(botInformation => {
@@ -27,17 +33,13 @@ bot.telegram.getMe()
         logger.debug('Server has initialized bot. Nick: ' + botInformation.username)
     })
 
-bot.use(async (ctx, next) => {
-    //console.log(ctx.channelPost)
-    const start = new Date()
-    await next()
-    const ms = new Date() - start
-    logger.info('Response time %sms', ms)
-})
-scenarioController(bot)
+botBody(bot, session)
+info(bot, session)
+support(bot, session)
+multySend(bot, session)
 
 bot.catch(err => {
-    logger.error(`Error in bot Middelware: ${err}`)
+    logger.error(`Error in bot Middleware: ${err}`)
 })
 
 bot.startPolling()
