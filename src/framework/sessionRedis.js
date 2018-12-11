@@ -4,8 +4,10 @@ import config from '../config/config-file'
 class sessionRedis {
     constructor(options) {
         this.options = Object.assign({
+            sessionUndefined: undefined,
             property: 'session',
-            getSessionKey: (ctx) => ctx.message.from.id && ctx.message.chat.id && `${ctx.message.from.id}:${ctx.message.chat.id}:${config.sessionSnippet}`,
+            //getSessionKey: (ctx) => ctx.message.from.id && ctx.message.chat.id && `${ctx.message.from.id}:${ctx.message.chat.id}:${config.sessionSnippet}`,
+            getSessionKey: (ctx) => {ctx.message ? ctx.message.from.id && ctx.message.chat.id && `${ctx.message.from.id}:${ctx.message.chat.id}:${config.sessionSnippet}` : true},
             store: {}
         }, options)
 

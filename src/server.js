@@ -15,7 +15,7 @@ import multySend from './logic/multySend'
 
 import sessionRedis from './framework/sessionRedis'
 
-const bot = new Telegraf(config.token, { channelMode: false })
+const bot = new Telegraf(config.token, { channelMode: true })
 
 
 const session = new sessionRedis({
