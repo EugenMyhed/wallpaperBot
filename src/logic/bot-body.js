@@ -7,72 +7,47 @@ import * as dbController from '../db/dbController'
 import config from '../config/config-file'
 
 export default function (bot) {
+    /*bot.use((ctx, next) =>{
+        if(ctx.channelPost.text === "/startWork"){
+            console.log(ctx.channelPost)
+        }
+        return next()
+    })*/
+
     bot.command('start', async (ctx, next) => {
         const myUser = await dbController.registerNewUser(ctx)
         messageSender.sendMessageText(ctx, 1)
     })
-    bot.hears('/test', async (ctx, next) => {
-        ctx.reply(sessionParser.depth(ctx, 's6'))
-    })
+    
     bot.hears('/clear', async (ctx, next) => {
         ctx.session.state = ''
         ctx.save()
         ctx.reply('cleared')
     })
-    bot.hears('Инструкция', async (ctx, next) => {
+    bot.hears('Узнать больше', async (ctx, next) => {
         messageSender.sendMessageText(ctx, 2)
+        
     })
-
-    bot.hears('Как сделать обмен?', async (ctx, next) => {
+    
+    bot.hears('Начать', async (ctx, next) => {
+        console.log(ctx.session)
         messageSender.sendText(ctx, 3)
     })
+    bot.command('startWork', (ctx) => {
+        console.log(ctx)
 
-    bot.hears('Экспресс обмен', async (ctx, next) => {
-        messageSender.sendText(ctx, 4)
-    })
+       //console.log(ctx.channelPost)
+    });
 
-    bot.hears('Автогарант', async (ctx, next) => {
-        messageSender.sendText(ctx, 5)
-    })
-
-    bot.hears('Поддержка', async (ctx, next) => {
-        messageSender.sendMessageText(ctx, 6)
-    })
-
-    bot.hears('Связаться с администратором', async (ctx, next) => {
-        messageSender.sendMessageText(ctx, 7)
-    })
-
-    bot.hears('Проблемы в работе бота', async (ctx, next) => {
-        messageSender.sendMessageText(ctx, 8)
-    })
-
-    bot.hears('Пожелания/улучшения', async (ctx, next) => {
-        messageSender.sendMessageText(ctx, 9)
-    })
-
-    bot.hears('Статус заявки', async (ctx, next) => {
-        messageSender.sendMessageText(ctx, 10)
-    })
-
-    bot.hears('Отменить последнюю заявку', async (ctx, next) => {
-        messageSender.sendMessageText(ctx, 11)
-    })
-
-    bot.hears(/(Обмен уже совершен)|(Нужно изменить заявку)/, async (ctx, next) => {
-        messageSender.sendMessageText(ctx, 12)
-    })
-
-    bot.hears('Другая причина', async (ctx, next) => {
-        messageSender.sendMessageText(ctx, 13)
-    })
-
-    bot.hears('Пропустить', async (ctx, next) => {
-        messageSender.sendMessageText(ctx, 14)
-    })
-    bot.hears('Наши отзывы', async (ctx, next) => {
-        messageSender.sendText(ctx, 15)
-    })
+    /*bot.hears('/startWork', async (ctx, next) => {
+        console.log(ctx)
+    })*/
+    /*bot.command('/', (ctx) => {
+        console.log(ctx.channelPost)
+        
+    });*/
+    
+/*
     bot.hears('Назад', async (ctx, next) => {
         // console.log(sessionParser.lastType(ctx, 's'))
         if (['s7', 's9', 's8'].includes(sessionParser.lastType(ctx, 's'))) {
@@ -116,12 +91,5 @@ export default function (bot) {
             return
         }
         return next()
-    })
-    // var ctx = {}
-    // ctx.session = {}
-    // ctx.session.state = ''
-    // ctx.save = () => {}
-    // ctx.message = { from: { id: 'id' } }
-    // messageSender.sendMessageText(ctx, 1)
-
+    })*/
 }
