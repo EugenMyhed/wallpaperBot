@@ -5,6 +5,8 @@ import * as messageSender from '../framework/messageSender'
 import * as sessionParser from '../framework/sessionParser'
 import * as dbController from '../db/dbController'
 import config from '../config/config-file'
+import getUserById from "../db/dbController"
+import { realpathSync } from 'fs';
 
 export default function (bot) {
     /*bot.use((ctx, next) =>{
@@ -15,7 +17,7 @@ export default function (bot) {
     })*/
 
     bot.command('start', async (ctx, next) => {
-        const myUser = await dbController.registerNewUser(ctx)
+        const myUser = await dbController.registerNewUser(ctx.message.from.id)
         messageSender.sendMessageText(ctx, 1)
     })
     
@@ -30,15 +32,41 @@ export default function (bot) {
     })
     
     bot.hears('Начать', async (ctx, next) => {
-        console.log(ctx.session)
         messageSender.sendText(ctx, 3)
+        ctx.reply("Your ID: \n" + ctx.message.from.id)
     })
-    bot.command('startWork', (ctx) => {
-        console.log(ctx)
-
-       //console.log(ctx.channelPost)
+    bot.hears('Создать пост', async (ctx, next) => {
+        messageSender.sendText(ctx, 4)
+    })
+    bot.hears('Назад', async (ctx, next) => {
+        messageSender.sendText(ctx, 5)
+       
+    })
+    bot.use((ctx) => {
+        const startWork = /\/startWork [0-9]+/;
+        if(ctx.channelPost){
+            if(startWork.test(ctx.channelPost.text)){
+            const userData = ctx.channelPost.text.split(" ");
+            if(userData.length === 2){
+                dbController.registerNewUser(parseInt(userData[1]));
+                dbController.getUser(parseInt(userData[1]))
+                .then(response => {
+                    if(response.user_id === parseInt(userData[1])){
+                        bot.telegram.sendMessage(ctx.channelPost.chat.id, "Канал создан!!!\nТеперь это твоя стена.")
+                        bot.telegram.sendMessage(userData[1],"Канал создан!!!\nТеперь ты можеш создать пост.")
+                    }
+                })
+                .catch(e => console.log(e))
+                }
+            }
+        }
     });
 
+    
+
+    
+    
+   
     /*bot.hears('/startWork', async (ctx, next) => {
         console.log(ctx)
     })*/
@@ -49,7 +77,7 @@ export default function (bot) {
     
 /*
     bot.hears('Назад', async (ctx, next) => {
-        // console.log(sessionParser.lastType(ctx, 's'))
+         //console.log(sessionParser.lastType(ctx, 's'))
         if (['s7', 's9', 's8'].includes(sessionParser.lastType(ctx, 's'))) {
             messageSender.sendMessageText(ctx, 6)
             return

@@ -4,8 +4,7 @@ import mongoose from 'mongoose'
 
 const dataSchema = mongoose.Schema({
     user_id: Number,
-    creationDate: String,
-    refCount: Number,
+    creationDate: String
 })
 
-export default mongoose.model('vizitkausers', dataSchema)
+export default mongoose.model('user', dataSchema)
