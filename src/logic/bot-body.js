@@ -9,18 +9,17 @@ import getUserById from "../db/dbController"
 import { realpathSync } from 'fs';
 
 export default function (bot) {
-    /*bot.use((ctx, next) =>{
-        if(ctx.channelPost.text === "/startWork"){
+    bot.use((ctx, next) => {
+        if (ctx.channelPost) {
             console.log(ctx.channelPost)
-        }
-        return next()
-    })*/
+        } else return next()
+    })
 
     bot.command('start', async (ctx, next) => {
         const myUser = await dbController.registerNewUser(ctx.message.from.id)
         messageSender.sendMessageText(ctx, 1)
     })
-    
+
     bot.hears('/clear', async (ctx, next) => {
         ctx.session.state = ''
         ctx.save()
@@ -28,9 +27,9 @@ export default function (bot) {
     })
     bot.hears('Узнать больше', async (ctx, next) => {
         messageSender.sendMessageText(ctx, 2)
-        
+
     })
-    
+
     bot.hears('Начать', async (ctx, next) => {
         messageSender.sendText(ctx, 3)
         ctx.reply("Your ID: \n" + ctx.message.from.id)

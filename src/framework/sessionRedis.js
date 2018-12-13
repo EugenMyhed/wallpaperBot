@@ -8,10 +8,10 @@ class sessionRedis {
             property: 'session',
             //getSessionKey: (ctx) => ctx.message.from.id && ctx.message.chat.id && `${ctx.message.from.id}:${ctx.message.chat.id}:${config.sessionSnippet}`,
             getSessionKey: (ctx) => {
-                if (ctx.message) {
+                if (ctx.message.from.id && ctx.message.chat.id) {
                     return `${ctx.message.from.id}:${ctx.message.chat.id}:${config.sessionSnippet}`
                 } else if (ctx.channelPost) {
-                    return `post:${ctx.channelPost.chat.id}:${config.sessionSnippet}`
+                    return `post:${ctx.channelPost.id}:${config.sessionSnippet}`
                 } else return 'undefinedSession'
             },
             store: {}
